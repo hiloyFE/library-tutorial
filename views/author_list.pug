@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  h1 #{title}
+
+  ul
+  each author in authors_list
+    li
+      a(href=author.url) #{author.name}
+      if author.span_time
+        span (#{author.span_time}) 
+  else
+    li There are no authors.

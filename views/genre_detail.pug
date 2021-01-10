@@ -1,0 +1,16 @@
+extends layout
+//- Pug 支持使用 block 和 extends 关键字进行模板的继承。一个称之为“块”（block）的代码块，可以被子模板覆盖、替换。这个过程是递归的。
+block content 
+  h1 Genre: #{genre.name}
+  div(style='margin-left:20px;margin-top:20px')
+
+    h4 Books
+
+    dl
+    each book in genre_books
+      dt
+        a(href=book.url) #{book.title}
+      dd #{book.summary}
+
+    else
+      p This genre has no books.
