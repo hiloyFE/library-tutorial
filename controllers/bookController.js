@@ -150,7 +150,7 @@ exports.book_delete_post =(req,res) =>{res.send('未实现：删除作者的post
 // get 显示更新作者的表单
 exports.book_update_get = (req,res,next)=>{
   async.parallel({
-    book:cb=>Book.find(req.params.id).populate('author').populate('genre').exec(cb),
+    book:cb=>Book.findById(req.params.id).populate('author').populate('genre').exec(cb),
     authors:cb=>Author.find(cb),
     genres:cb=>Genre.find(cb)
   },(err,result)=>{
@@ -175,6 +175,7 @@ exports.book_update_get = (req,res,next)=>{
 exports.book_update_post = [
   // 将genre由string转化为数组
   (req,res,next)=>{
+    console.log(req.body,777);
     if(!(req.body.genre instanceof Array)){
       if(typeof req.body.genre ==='undefined')
       req.body.genre=[]
@@ -197,7 +198,7 @@ exports.book_update_post = [
   // 请求
   (req,res,next)=>{
     const err = validationResult(req)
-    console.log(res,9900);
+    console.log(req.body,9900);
     var book =new Book({
       title:req.body.title,
       author:req.body.author,
@@ -206,7 +207,7 @@ exports.book_update_post = [
       genre:(typeof req.body.genre === 'undefined') ? []:req.body.genre,
       _id:req.params.id
     })
-    if(!err.isEmpty()){
+    if(!err.isEmpty()){ 
       // 有错误的时候，渲染消毒后的信息
       async.parallel({
         authors:cb=>{
@@ -216,6 +217,7 @@ exports.book_update_post = [
           Genre.find(cb)
         }
       },(err,result)=>{
+        console.log(result,556);
         if(err){return next(err)}
         for(let i=0;i<result.genre[i]._id;i++){
           if(book.genre.indexOf(result.genres[i]._id)>-1){
@@ -225,8 +227,10 @@ exports.book_update_post = [
         res.render('book_form',{title:'Update Book',authors:result.authors,genres:result.genres,book,error:err.array()})
       })
     }else{
-      // 数据有效，更新记录
-      Book.findByIdAndRemove(req.body.id,book,{},(err,result)=>{
+      // 数据有效，更新记录 req.params.id和req.body._id一致
+      // findByIdAndUpdate(id,option,callback)根据id查询，传递option通过cb执行
+      Book.findByIdAndUpdate(req.params.id,book,{},(err,result)=>{
+        console.log(result,334);
         if(err){return next(err)}
         res.redirect(result.url)
       })
