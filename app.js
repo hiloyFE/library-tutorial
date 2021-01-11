@@ -28,9 +28,8 @@ app.use('/users', usersRouter);
 app.use('/catalog',catalogRouter);//访问藏书列表 的URL 为：/catalog/books/。
 
 const mongoose = require("mongoose")
-// const mongoDB = 'mongodb+srv://hiloy:12345msn@cluster0.tjrup.mongodb.net/hiloy?retryWrites=true&w=majority'
-
-const uri = "mongodb+srv://hiloy:12345msn@cluster0.tjrup.mongodb.net/library_db?retryWrites=true&w=majority";
+// process.env.MONGODB_URI从MONGODB_URI的环境变量中获取字符串【原本是硬编码】
+const uri =process.env.MONGODB_URI|| "mongodb+srv://hiloy:12345msn@cluster0.tjrup.mongodb.net/library_db?retryWrites=true&w=majority";
 mongoose.set('useNewUrlParser', true);
 // 连接数据库
 mongoose.connect(uri,{ useNewUrlParser: true,useUnifiedTopology: true })

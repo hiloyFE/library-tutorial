@@ -6,7 +6,7 @@ const {body,validationResult,sanitizeBody} = require('express-validator')
 
 //显示完整作者列表
 // exports.author_list = (req,res)=>{res.send('未实现：作者列表')}
-exports.author_list = function (req,res,next) {
+exports.author_list =  (req,res,next)=> {
   Author.find()
   .sort([['family','ascending']])
   .exec(function (err,list_authors) {
@@ -15,7 +15,7 @@ exports.author_list = function (req,res,next) {
   })
 }
 // 为每位作者显示详细信息的页面
-exports.author_detail = (req,res) =>{
+exports.author_detail = (req,res,next) =>{
   async.parallel({
     author:cb=>{
       Author.findById(req.params.id)
@@ -26,6 +26,7 @@ exports.author_detail = (req,res) =>{
       .exec(cb)
     }
   },(err,result)=>{
+    console.log(result);
     if(err){return next(err)}
     if(result.author==null){
       var err = new Error('Author not find')
@@ -76,10 +77,12 @@ exports.author_create_post= [
 
 // post处理作者创建操作：只能删除未被book引用的author，如果是有book提示先删除book
 exports.author_delete_get= (req,res,next)=>{
+  console.log(req.params);
   async.parallel({
     author:cb=>Author.findById(req.params.id).exec(cb),
-    authors_books:cb=>Book.findById({'author':req.params.id}).exec(cb)
+    authors_books:cb=>Book.find({'author':req.params.id}).exec(cb)
   },(err,result)=>{
+    console.log();
     if(err){return next(err)}
     if(result.author==null){
       //作者不存在就显示作者列表
@@ -93,8 +96,9 @@ exports.author_delete_get= (req,res,next)=>{
 exports.author_delete_post =(req,res,next) =>{
   async.parallel({
     // 参数 post是req.body.属性  get是req.params.属性
+    // findById(id)  find({属性：属性值})
     author:cb=>Author.findById(req.body.authorid).exec(cb),
-    authors_books:cb=>Book.findById({'author':req.body.authorid}).exec(cb)
+    authors_books:cb=>Book.find({'author':req.body.authorid}).exec(cb)
   },(err,result)=>{
     if(err){return next(err)}
     if(result.authors_books.length>0){

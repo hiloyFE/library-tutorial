@@ -17,7 +17,13 @@ AuthorSchema.virtual('name').get(function () {
 })
 
 AuthorSchema.virtual('lifespan').get(function () {
-  return (this.data_of_death.getYear()-this.date_of_birth.getYear()).toString() 
+  if(this.data_of_death&&this.date_of_birth){
+    return (this.data_of_death.getYear()-this.date_of_birth.getYear()).toString()  
+  }else  if(this.data_of_death){
+    return (this.data_of_death.getYear()-new Date().getYear()).toString()  
+  }else{
+    return ''
+  }
 })
 AuthorSchema
 .virtual('span_time')
